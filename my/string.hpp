@@ -9,10 +9,12 @@ namespace my
 	class string
 	{
 	public:
+		typedef size_t size_type;
+
 		string();
 		string(const string& str);
 		string(const char* s);
-		string(size_t n, char c);
+		string(size_type n, char c);
 
 		string& operator= (const string& str);
 		string& operator= (const char* s);
