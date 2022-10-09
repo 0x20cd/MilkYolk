@@ -1,5 +1,5 @@
 #include <iostream>
-#include "mystring.hpp"
+#include "my/string.hpp"
 
 int main()
 {
