@@ -36,6 +36,7 @@ namespace my
 		bool empty() const;
 		size_t size() const;
 
+		~string();
 
 	private:
 		int8_t slen; // when slen >= 0, it contains length of the short string, stored in data.buf;
