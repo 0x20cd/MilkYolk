@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 
 namespace my
 {
@@ -52,5 +53,7 @@ namespace my
 	};
 
 }
+
+std::ostream& operator<< (std::ostream& o, const my::string& str);
 
 #endif//MY_STRING_HPP

@@ -221,3 +221,11 @@ my::string::~string()
 	if (this->slen < 0)
 		delete[] this->data.l.ptr;
 }
+
+std::ostream& operator<< (std::ostream& o, const my::string& str)
+{
+	for (const char &c : str)
+		o << c;
+	
+	return o;
+}
