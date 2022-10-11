@@ -7,7 +7,7 @@ my::string::string()
 	this->data.buf[0] = 0;
 }
 
-my::string::string(const string& str)
+my::string::string(const my::string& str)
 {
 	size_t size = str.size();
 	if (size < sizeof(this->data.buf)/sizeof(char)) {
@@ -76,4 +76,75 @@ const char* my::string::c_str() const
 	if (this->slen >= 0)
 		return this->data.buf;
 	return this->data.l.ptr;
+}
+
+my::string& my::string::operator= (const my::string& str)
+{
+	size_t size = str.size();
+	if (size < sizeof(this->data.buf)/sizeof(char))
+	{
+		if (this->slen < 0)
+			delete[] this->data.l.ptr;
+
+		this->slen = size;
+		strcpy(this->data.buf, str.c_str());
+		return *this;
+	}
+
+	if (this->slen < 0 && size >= this->data.l.res)
+	{
+		delete[] this->data.l.ptr;
+		this->slen = 0;
+	}
+
+	if (this->slen >= 0) {
+		this->data.l.res = size + 1;
+		this->data.l.ptr = new char[size + 1];
+	}
+	
+	this->slen = -1;
+	this->data.l.len = size;
+	strcpy(this->data.l.ptr, str.c_str());
+	return *this;
+}
+
+my::string& my::string::operator= (const char* s)
+{
+	size_t size = strlen(s);
+	if (size < sizeof(this->data.buf)/sizeof(char))
+	{
+		if (this->slen < 0)
+			delete[] this->data.l.ptr;
+
+		this->slen = size;
+		strcpy(this->data.buf, s);
+		return *this;
+	}
+
+	if (this->slen < 0 && size >= this->data.l.res)
+	{
+		delete[] this->data.l.ptr;
+		this->slen = 0;
+	}
+
+	if (this->slen >= 0) {
+		this->data.l.res = size + 1;
+		this->data.l.ptr = new char[size + 1];
+	}
+	
+	this->slen = -1;
+	this->data.l.len = size;
+	strcpy(this->data.l.ptr, s);
+	return *this;
+}
+
+my::string& my::string::operator= (char c)
+{
+	if (this->slen < 0)
+		delete[] this->data.l.ptr;
+
+	this->slen = 1;
+	this->data.buf[0] = c;
+	this->data.buf[1] = 0;
+	return *this;
 }
