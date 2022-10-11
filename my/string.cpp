@@ -58,26 +58,6 @@ my::string::string(size_t n, char c)
 	this->data.l.ptr[n] = 0;
 }
 
-my::string::~string()
-{
-	if (this->slen < 0)
-		delete[] this->data.l.ptr;
-}
-
-size_t my::string::size() const
-{
-	if (this->slen >= 0)
-		return this->slen;
-	return this->data.l.len;
-}
-
-const char* my::string::c_str() const
-{
-	if (this->slen >= 0)
-		return this->data.buf;
-	return this->data.l.ptr;
-}
-
 my::string& my::string::operator= (const my::string& str)
 {
 	size_t size = str.size();
@@ -147,4 +127,97 @@ my::string& my::string::operator= (char c)
 	this->data.buf[0] = c;
 	this->data.buf[1] = 0;
 	return *this;
+}
+
+char& my::string::operator[] (size_t pos)
+{
+	if (this->slen < 0)
+		return this->data.l.ptr[pos];
+
+	return this->data.buf[pos];
+}
+
+const char& my::string::operator[] (size_t pos) const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr[pos];
+
+	return this->data.buf[pos];
+}
+
+const char* my::string::c_str() const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr;
+	
+	return this->data.buf;
+}
+
+char* my::string::begin()
+{
+	if (this->slen < 0)
+		return this->data.l.ptr;
+	
+	return this->data.buf;
+}
+
+char* my::string::end()
+{
+	if (this->slen < 0)
+		return this->data.l.ptr + this->data.l.len;
+	
+	return this->data.buf + this->slen;
+}
+
+const char* my::string::begin() const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr;
+	
+	return this->data.buf;
+}
+
+const char* my::string::end() const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr + this->data.l.len;
+	
+	return this->data.buf + this->slen;
+}
+
+const char* my::string::cbegin() const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr;
+	
+	return this->data.buf;
+}
+
+const char* my::string::cend() const
+{
+	if (this->slen < 0)
+		return this->data.l.ptr + this->data.l.len;
+	
+	return this->data.buf + this->slen;
+}
+
+bool my::string::empty() const
+{
+	if (this->slen < 0)
+		return this->data.l.len == 0;
+
+	return this->slen == 0;
+}
+
+size_t my::string::size() const
+{
+	if (this->slen >= 0)
+		return this->slen;
+	return this->data.l.len;
+}
+
+my::string::~string()
+{
+	if (this->slen < 0)
+		delete[] this->data.l.ptr;
 }
