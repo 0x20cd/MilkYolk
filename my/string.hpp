@@ -2,6 +2,7 @@
 #define MY_STRING_HPP
 
 #include <cstddef>
+#include <cstdint>
 
 namespace my
 {
@@ -19,6 +20,14 @@ namespace my
 		string& operator= (char c);
 
 	private:
+		int8_t slen;
+		union {
+			struct ldata {
+				size_t len, res;
+				char *ptr;
+			} l;
+			char buf[40];
+		} data;
 	};
 
 }
