@@ -18,15 +18,35 @@ namespace my
 		string& operator= (const string& str);
 		string& operator= (const char* s);
 		string& operator= (char c);
+		string& operator+= (const string& str);
+		string& operator+= (const char* s);
+		string& operator+= (char c);
+
+		char& operator[] (size_t pos);
+		const char& operator[] (size_t pos) const;
+		const char* c_str() const;
+
+		char* begin();
+		char* end();
+		const char* begin() const;
+		const char* end() const;
+		const char* cbegin() const;
+		const char* cend() const;
+
+		bool empty() const;
+		size_t size() const;
+
 
 	private:
-		int8_t slen;
+		int8_t slen; // when slen >= 0, it contains length of the short string, stored in data.buf;
+		             // when slen < 0, info about the string is stored in data.l
 		union {
-			struct ldata {
-				size_t len, res;
-				char *ptr;
+			struct {
+				char *ptr; // ptr - storage for the long string
+				size_t len, res; // len - size of the long string, stored in data.l.ptr;
+				                 // res - number of bytes reserved in data.l.ptr;
 			} l;
-			char buf[40];
+			char buf[42];
 		} data;
 	};
 
