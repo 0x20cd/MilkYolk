@@ -40,6 +40,8 @@ namespace my
 		~string();
 
 	private:
+		static constexpr size_t BUFSIZE = 42;
+		
 		int8_t slen; // when slen >= 0, it contains length of the short string, stored in data.buf;
 		             // when slen < 0, info about the string is stored in data.l
 		union {
@@ -48,7 +50,7 @@ namespace my
 				size_t len, res; // len - size of the long string, stored in data.l.ptr;
 				                 // res - number of bytes reserved in data.l.ptr;
 			} l;
-			char buf[42];
+			char buf[BUFSIZE];
 		} data;
 	};
 

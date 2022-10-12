@@ -10,7 +10,7 @@ my::string::string()
 my::string::string(const my::string& str)
 {
 	size_t size = str.size();
-	if (size < sizeof(this->data.buf)/sizeof(char)) {
+	if (size < my::string::BUFSIZE) {
 		this->slen = size;
 		strcpy(this->data.buf, str.c_str());
 		return;
@@ -26,7 +26,7 @@ my::string::string(const my::string& str)
 my::string::string(const char* s)
 {
 	size_t size = strlen(s);
-	if (size < sizeof(this->data.buf)/sizeof(char)) {
+	if (size < my::string::BUFSIZE) {
 		this->slen = size;
 		strcpy(this->data.buf, s);
 		return;
@@ -41,7 +41,7 @@ my::string::string(const char* s)
 
 my::string::string(size_t n, char c)
 {
-	if (n < sizeof(this->data.buf)/sizeof(char)) {
+	if (n < my::string::BUFSIZE) {
 		this->slen = n;
 		for (size_t i = 0; i < n; ++i)
 			this->data.buf[i] = c;
@@ -61,7 +61,7 @@ my::string::string(size_t n, char c)
 my::string& my::string::operator= (const my::string& str)
 {
 	size_t size = str.size();
-	if (size < sizeof(this->data.buf)/sizeof(char))
+	if (size < my::string::BUFSIZE)
 	{
 		if (this->slen < 0)
 			delete[] this->data.l.ptr;
@@ -91,7 +91,7 @@ my::string& my::string::operator= (const my::string& str)
 my::string& my::string::operator= (const char* s)
 {
 	size_t size = strlen(s);
-	if (size < sizeof(this->data.buf)/sizeof(char))
+	if (size < my::string::BUFSIZE)
 	{
 		if (this->slen < 0)
 			delete[] this->data.l.ptr;
