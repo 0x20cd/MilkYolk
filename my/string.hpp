@@ -56,6 +56,11 @@ namespace my
 
 }
 
+my::string operator+ (const my::string& lstr, const my::string& rstr);
+my::string operator+ (const my::string& lstr, const char* rs);
+my::string operator+ (const my::string& lstr, char rc);
+my::string operator+ (const char* ls, const my::string& rstr);
+my::string operator+ (char lc, const my::string& rstr);
 std::ostream& operator<< (std::ostream& o, const my::string& str);
 
 #endif//MY_STRING_HPP

@@ -333,6 +333,36 @@ my::string::~string()
 		delete[] this->data.l.ptr;
 }
 
+my::string operator+ (const my::string& lstr, const my::string& rstr)
+{
+	my::string s = lstr;
+	return s += rstr;
+}
+
+my::string operator+ (const my::string& lstr, const char* rs)
+{
+	my::string s = lstr;
+	return s += rs;
+}
+
+my::string operator+ (const my::string& lstr, char rc)
+{
+	my::string s = lstr;
+	return s += rc;
+}
+
+my::string operator+ (const char* ls, const my::string& rstr)
+{
+	my::string s = ls;
+	return s += rstr;
+}
+
+my::string operator+ (char lc, const my::string& rstr)
+{
+	my::string s;
+	return s = lc, s += rstr;
+}
+
 std::ostream& operator<< (std::ostream& o, const my::string& str)
 {
 	for (const char &c : str)
