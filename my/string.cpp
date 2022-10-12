@@ -10,9 +10,10 @@ my::string::string()
 my::string::string(const my::string& str)
 {
 	size_t size = str.size();
-	if (size < my::string::BUFSIZE) {
+	if (size < my::string::BUFSIZE)
+	{
 		this->slen = size;
-		strcpy(this->data.buf, str.c_str());
+		memcpy(this->data.buf, str.c_str(), size + 1);
 		return;
 	}
 
@@ -20,13 +21,14 @@ my::string::string(const my::string& str)
 	this->data.l.len = size;
 	this->data.l.res = size + 1;
 	this->data.l.ptr = new char[size + 1];
-	strcpy(this->data.l.ptr, str.c_str());
+	memcpy(this->data.l.ptr, str.c_str(), size + 1);
 }
 
 my::string::string(const char* s)
 {
 	size_t size = strlen(s);
-	if (size < my::string::BUFSIZE) {
+	if (size < my::string::BUFSIZE)
+	{
 		this->slen = size;
 		strcpy(this->data.buf, s);
 		return;
@@ -41,10 +43,10 @@ my::string::string(const char* s)
 
 my::string::string(size_t n, char c)
 {
-	if (n < my::string::BUFSIZE) {
+	if (n < my::string::BUFSIZE)
+	{
 		this->slen = n;
-		for (size_t i = 0; i < n; ++i)
-			this->data.buf[i] = c;
+		memset(this->data.buf, c, n);
 		this->data.buf[n] = 0;
 		return;
 	}
@@ -53,8 +55,8 @@ my::string::string(size_t n, char c)
 	this->data.l.len = n;
 	this->data.l.res = n+1;
 	this->data.l.ptr = new char[n+1];
-	for (size_t i = 0; i < n; ++i)
-		this->data.l.ptr[i] = c;
+
+	memset(this->data.l.ptr, c, n);
 	this->data.l.ptr[n] = 0;
 }
 
@@ -67,7 +69,7 @@ my::string& my::string::operator= (const my::string& str)
 			delete[] this->data.l.ptr;
 
 		this->slen = size;
-		strcpy(this->data.buf, str.c_str());
+		memcpy(this->data.buf, str.c_str(), size + 1);
 		return *this;
 	}
 
@@ -77,14 +79,15 @@ my::string& my::string::operator= (const my::string& str)
 		this->slen = 0;
 	}
 
-	if (this->slen >= 0) {
+	if (this->slen >= 0)
+	{
+		this->slen = -1;
 		this->data.l.res = size + 1;
 		this->data.l.ptr = new char[size + 1];
 	}
 	
-	this->slen = -1;
 	this->data.l.len = size;
-	strcpy(this->data.l.ptr, str.c_str());
+	memcpy(this->data.l.ptr, str.c_str(), size + 1);
 	return *this;
 }
 
@@ -107,12 +110,13 @@ my::string& my::string::operator= (const char* s)
 		this->slen = 0;
 	}
 
-	if (this->slen >= 0) {
+	if (this->slen >= 0)
+	{
+		this->slen = -1;
 		this->data.l.res = size + 1;
 		this->data.l.ptr = new char[size + 1];
 	}
 	
-	this->slen = -1;
 	this->data.l.len = size;
 	strcpy(this->data.l.ptr, s);
 	return *this;
@@ -213,6 +217,7 @@ size_t my::string::size() const
 {
 	if (this->slen >= 0)
 		return this->slen;
+
 	return this->data.l.len;
 }
 
