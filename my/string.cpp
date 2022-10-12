@@ -133,6 +133,112 @@ my::string& my::string::operator= (char c)
 	return *this;
 }
 
+my::string& my::string::operator+= (const my::string& str)
+{
+	size_t isize = this->size(), size = str.size(), rsize = isize + size;
+
+	if (this->slen >= 0 && rsize < my::string::BUFSIZE)
+	{
+		memcpy(this->data.buf + isize, str.c_str(), size + 1);
+		this->slen = rsize;
+		return *this;
+	}
+
+	char *p;
+
+	if (this->slen >= 0 || rsize >= this->data.l.res)
+	{
+		p = new char[rsize + 1];
+
+		if (this->slen < 0) {
+			memcpy(p, this->data.l.ptr, isize);
+			delete[] this->data.l.ptr;
+		} else {
+			memcpy(p, this->data.buf, isize);
+			this->slen = -1;
+		}
+
+		this->data.l.ptr = p;
+	}
+
+	memcpy(this->data.l.ptr + isize, str.c_str(), size + 1);
+	this->data.l.len = rsize;
+	this->data.l.res = rsize + 1;
+
+	return *this;
+}
+
+my::string& my::string::operator+= (const char* s)
+{
+	size_t isize = this->size(), rsize = isize + strlen(s);
+
+	if (this->slen >= 0 && rsize < my::string::BUFSIZE)
+	{
+		strcpy(this->data.buf + isize, s);
+		this->slen = rsize;
+		return *this;
+	}
+
+	char *p;
+
+	if (this->slen >= 0 || rsize >= this->data.l.res)
+	{
+		p = new char[rsize + 1];
+
+		if (this->slen < 0) {
+			memcpy(p, this->data.l.ptr, isize);
+			delete[] this->data.l.ptr;
+		} else {
+			memcpy(p, this->data.buf, isize);
+			this->slen = -1;
+		}
+
+		this->data.l.ptr = p;
+	}
+
+	strcpy(this->data.l.ptr + isize, s);
+	this->data.l.len = rsize;
+	this->data.l.res = rsize + 1;
+
+	return *this;
+}
+
+my::string& my::string::operator+= (char c)
+{
+	size_t isize = this->size();
+
+	if (this->slen >= 0 && isize + 1 < my::string::BUFSIZE)
+	{
+		this->data.buf[this->slen] = c;
+		this->data.buf[++this->slen] = 0;
+		return *this;
+	}
+
+	char *p;
+
+	if (this->slen >= 0 || isize + 1 >= this->data.l.res)
+	{
+		p = new char[isize + 2];
+
+		if (this->slen < 0) {
+			memcpy(p, this->data.l.ptr, isize);
+			delete[] this->data.l.ptr;
+		} else {
+			memcpy(p, this->data.buf, isize);
+			this->slen = -1;
+		}
+
+		this->data.l.ptr = p;
+	}
+
+	this->data.l.ptr[isize] = c;
+	this->data.l.ptr[isize + 1] = 0;
+	this->data.l.len = isize + 1;
+	this->data.l.res = isize + 2;
+
+	return *this;
+}
+
 char& my::string::operator[] (size_t pos)
 {
 	if (this->slen < 0)
