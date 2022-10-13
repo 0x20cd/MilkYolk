@@ -38,10 +38,9 @@ namespace my
 		size_t size() const;
 
 		~string();
+		static constexpr size_t BUFSIZE = 42;
 
 	private:
-		static constexpr size_t BUFSIZE = 42;
-		
 		int8_t slen; // when slen >= 0, it contains length of the short string, stored in data.buf;
 		             // when slen < 0, info about the string is stored in data.l
 		union {
