@@ -1,5 +1,6 @@
 #ifndef MY_LIST_HPP
 #define MY_LIST_HPP
+#include <cstddef>
 
 namespace my
 {
@@ -12,23 +13,27 @@ namespace my
 		{
 			node *prev, *next;
 			T value;
-		};
+		} *firstNode, *lastNode;
 
 	public:
+		explicit list();
 		explicit list(size_t n, const T& val = T());
 		list(const list& x);
+
+		class iterator;
+		typedef const iterator const_iterator;
 
 		class iterator
 		{
 		public:
 			iterator(); // has to set ptr to NULL
-			iterator(const iterator& it);
+			iterator(const_iterator& it);
 
-			iterator& operator=(const iterator& it);
+			iterator& operator=(const_iterator& it);
 
 			T& operator*();
-			T* operator->();
 			const T& operator*() const;
+			T* operator->();
 			const T* operator->() const;
 
 			iterator& operator++();
@@ -39,8 +44,6 @@ namespace my
 		private:
 			node *ptr;
 		};
-
-		typedef const iterator const_iterator;
 
 		iterator begin();
 		iterator end();
@@ -58,11 +61,11 @@ namespace my
 }
 
 template<class T>
-bool operator==(typename my::list<T>::const_iterator &itl,
-                typename my::list<T>::const_iterator &itr);
+bool operator==(typename my::list<T>::const_iterator& itl,
+                typename my::list<T>::const_iterator& itr);
 
 template<class T>
-bool operator!=(typename my::list<T>::const_iterator &itl,
-                typename my::list<T>::const_iterator &itr);
+bool operator!=(typename my::list<T>::const_iterator& itl,
+                typename my::list<T>::const_iterator& itr);
 
 #endif//MY_LIST_HPP
