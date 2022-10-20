@@ -2,19 +2,28 @@
 
 template<class T>
 my::list<T>::list() :
-	this->firstNode(nullptr),
-	this->lastNode(nullptr)
-{
+	len(0),
+	firstNode(nullptr),
+	lastNode(nullptr) {}
 
-}
-
-/*template<class T>
+template<class T>
 my::list<T>::list(const my::list<T>& x) :
-	this->firstNode(nullptr),
-	this->lastNode(nullptr)
+	len(x.size()),
+	firstNode(nullptr),
+	lastNode(nullptr)
 {
-	
-}*/
+	auto *last = nullptr, **nextp = &this->firstNode;
+
+	for (const T& v : x)
+	{
+		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
+		(*nextp)->prev = last;
+		last = *nextp;
+		nextp = &(*nextp)->next;
+	}
+
+	this->lastNode = last;
+}
 
 template<class T>
 typename my::list<T>::iterator my::list<T>::begin()
@@ -50,6 +59,18 @@ template<class T>
 typename my::list<T>::const_iterator my::list<T>::cend() const
 {
 	return my::list<T>::const_iterator(nullptr);
+}
+
+template<class T>
+bool my::list<T>::empty() const
+{
+	return this->len==0;
+}
+
+template<class T>
+size_t my::list<T>::size() const
+{
+	return this->len;
 }
 
 ////////////////////////////////////////////////////////////////////

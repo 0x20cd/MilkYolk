@@ -9,6 +9,7 @@ namespace my
 	class list
 	{
 	private:
+		size_t len;
 		struct node
 		{
 			node *prev, *next;
@@ -52,8 +53,8 @@ namespace my
 		const_iterator cbegin() const;
 		const_iterator cend() const;
 
-		bool empty();
-		size_t size();
+		bool empty() const;
+		size_t size() const;
 
 		~list();
 	};
