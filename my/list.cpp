@@ -1,25 +1,65 @@
 #include "list.hpp"
 
 template<class T>
-my::list<T>::list()
+my::list<T>::list() :
+	this->firstNode(nullptr),
+	this->lastNode(nullptr)
 {
-	this->firstNode = this->lastNode = nullptr;
+
 }
 
 /*template<class T>
-my::list<T>::list(const my::list<T>& x)
+my::list<T>::list(const my::list<T>& x) :
+	this->firstNode(nullptr),
+	this->lastNode(nullptr)
 {
-
+	
 }*/
+
+template<class T>
+typename my::list<T>::iterator my::list<T>::begin()
+{
+	return my::list<T>::iterator(firstNode);
+}
+
+template<class T>
+typename my::list<T>::iterator my::list<T>::end()
+{
+	return my::list<T>::iterator(nullptr);
+}
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::begin() const
+{
+	return my::list<T>::const_iterator(firstNode);
+}
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::end() const
+{
+	return my::list<T>::const_iterator(nullptr);
+}
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::cbegin() const
+{
+	return my::list<T>::const_iterator(firstNode);
+}
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::cend() const
+{
+	return my::list<T>::const_iterator(nullptr);
+}
 
 ////////////////////////////////////////////////////////////////////
 ///////////////////////    list::iterator    ///////////////////////
 ////////////////////////////////////////////////////////////////////
 
 template<class T>
-my::list<T>::iterator::iterator()
+my::list<T>::iterator::iterator(typename my::list<T>::node* ptr)
 {
-	this->ptr = nullptr;
+	this->ptr = ptr;
 }
 
 template<class T>
