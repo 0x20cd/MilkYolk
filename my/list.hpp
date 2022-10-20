@@ -27,7 +27,7 @@ namespace my
 		class iterator
 		{
 		public:
-			iterator(node* ptr = nullptr); // has to set ptr to NULL
+			iterator(node* ptr = nullptr);
 			iterator(const_iterator& it);
 
 			iterator& operator=(const_iterator& it);
