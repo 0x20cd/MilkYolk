@@ -1,6 +1,7 @@
 #ifndef MY_LIST_HPP
 #define MY_LIST_HPP
 #include <cstddef>
+#include <initializer_list>
 
 namespace my
 {
@@ -20,6 +21,7 @@ namespace my
 		explicit list();
 		explicit list(size_t n, const T& val = T());
 		list(const list& x);
+		list(std::initializer_list<T> il);
 
 		class iterator;
 		typedef const iterator const_iterator;
