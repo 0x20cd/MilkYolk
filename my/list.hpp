@@ -249,10 +249,10 @@ void my::list<T>::pop_back()
 template<class T>
 void my::list<T>::clear()
 {
-	for(my::list<T>::node *p = this->firstNode, *t; p;)
+	for(my::list<T>::node *p = this->lastNode, *t; p;)
 	{
 		t = p;
-		p = p->next;
+		p = p->prev;
 		delete t;
 	}
 
