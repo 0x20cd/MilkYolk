@@ -82,6 +82,7 @@ my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 		nextp = &(*nextp)->next;
 	}
 
+	this->len = x.size();
 	this->lastNode = last;
 
 	return *this;
@@ -141,6 +142,15 @@ template<class T>
 size_t my::list<T>::size() const
 {
 	return this->len;
+}
+
+
+template<class T>
+void my::list<T>::push_back(const T& val)
+{
+	auto **nextp = this->len++ ? &this->lastNode->next : &this->firstNode;
+
+	this->lastNode = *nextp = new my::list<T>::node{this->lastNode, nullptr, {val}};
 }
 
 

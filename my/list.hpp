@@ -60,6 +60,7 @@ namespace my
 		bool empty() const;
 		size_t size() const;
 
+		void push_back(const T& val);
 		void clear();
 
 		~list();
