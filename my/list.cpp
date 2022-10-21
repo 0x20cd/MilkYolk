@@ -68,6 +68,27 @@ my::list<T>::list(std::initializer_list<T> il) :
 
 
 template<class T>
+my::list<T>& my::list<T>::operator=(const my::list<T>& x)
+{
+	this->clear();
+
+	auto *last = nullptr, **nextp = &this->firstNode;
+
+	for (const T& v : x)
+	{
+		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
+		(*nextp)->prev = last;
+		last = *nextp;
+		nextp = &(*nextp)->next;
+	}
+
+	this->lastNode = last;
+
+	return *this;
+}
+
+
+template<class T>
 typename my::list<T>::iterator my::list<T>::begin()
 {
 	return my::list<T>::iterator(firstNode);
@@ -120,6 +141,28 @@ template<class T>
 size_t my::list<T>::size() const
 {
 	return this->len;
+}
+
+
+template<class T>
+void my::list<T>::clear()
+{
+	for(my::list<T>::node *p = this->firstNode, *t; p;)
+	{
+		t = p;
+		p = p->next;
+		delete t;
+	}
+
+	this->len = 0;
+	this->firstNode = this->lastNode = nullptr;
+}
+
+
+template<class T>
+my::list<T>::~list()
+{
+	this->clear();
 }
 
 

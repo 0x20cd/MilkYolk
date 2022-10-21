@@ -23,6 +23,8 @@ namespace my
 		list(const list& x);
 		list(std::initializer_list<T> il);
 
+		list& operator=(const list& x);
+
 		class iterator;
 		typedef const iterator const_iterator;
 
@@ -57,6 +59,8 @@ namespace my
 
 		bool empty() const;
 		size_t size() const;
+
+		void clear();
 
 		~list();
 	};
