@@ -153,6 +153,22 @@ void my::list<T>::push_back(const T& val)
 	this->lastNode = *nextp = new my::list<T>::node{this->lastNode, nullptr, {val}};
 }
 
+template<class T>
+void my::list<T>::pop_back()
+{
+	if (!this->lastNode) // len = 0
+		return;
+
+	auto *t = this->lastNode;
+	this->lastNode = t->prev;
+	delete t;
+
+	if (!this->lastNode) // len = 1
+		this->firstNode = nullptr;
+
+	--this->len;
+}
+
 
 template<class T>
 void my::list<T>::clear()

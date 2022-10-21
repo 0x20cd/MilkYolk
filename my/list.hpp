@@ -61,6 +61,7 @@ namespace my
 		size_t size() const;
 
 		void push_back(const T& val);
+		void pop_back();
 		void clear();
 
 		~list();
