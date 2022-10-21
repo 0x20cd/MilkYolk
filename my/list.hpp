@@ -46,6 +46,9 @@ namespace my
 			iterator& operator--();
 			iterator operator--(int);
 
+			bool operator==(const_iterator& itr) const;
+			bool operator!=(const_iterator& itr) const;
+
 		private:
 			node *ptr;
 		};
@@ -69,14 +72,6 @@ namespace my
 
 }
 
-template<class T>
-bool operator==(typename my::list<T>::const_iterator& itl,
-                typename my::list<T>::const_iterator& itr);
-
-template<class T>
-bool operator!=(typename my::list<T>::const_iterator& itl,
-                typename my::list<T>::const_iterator& itr);
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -94,7 +89,7 @@ my::list<T>::list(size_t n, const T& val) :
 	firstNode(nullptr),
 	lastNode(nullptr)
 {
-	auto *last = nullptr, **nextp = &this->firstNode;
+	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
 	for (size_t i = 0; i < n; ++i)
 	{
@@ -114,7 +109,7 @@ my::list<T>::list(const my::list<T>& x) :
 	firstNode(nullptr),
 	lastNode(nullptr)
 {
-	auto *last = nullptr, **nextp = &this->firstNode;
+	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
 	for (const T& v : x)
 	{
@@ -134,7 +129,7 @@ my::list<T>::list(std::initializer_list<T> il) :
 	firstNode(nullptr),
 	lastNode(nullptr)
 {
-	auto *last = nullptr, **nextp = &this->firstNode;
+	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
 	for (const T& v : il)
 	{
@@ -363,18 +358,16 @@ typename my::list<T>::iterator my::list<T>::iterator::operator--(int)
 
 
 template<class T>
-bool operator==(typename my::list<T>::const_iterator& itl,
-                typename my::list<T>::const_iterator& itr)
+bool my::list<T>::iterator::operator==(typename my::list<T>::const_iterator& itr) const
 {
-	return itl.ptr == itr.ptr;
+	return this->ptr == itr.ptr;
 }
 
 
 template<class T>
-bool operator!=(typename my::list<T>::const_iterator& itl,
-                typename my::list<T>::const_iterator& itr)
+bool my::list<T>::iterator::operator!=(typename my::list<T>::const_iterator& itr) const
 {
-	return itl.ptr != itr.ptr;
+	return this->ptr != itr.ptr;
 }
 
 
