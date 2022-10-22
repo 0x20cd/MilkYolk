@@ -102,11 +102,16 @@ my::string& my::string::operator= (const my::string& str)
 
 my::string& my::string::operator= (my::string&& str)
 {
+	if (this->slen < 0)
+		delete[] this->data.l.ptr;
+
 	this->slen = str.slen;
 	this->data = str.data;
 
 	str.slen = 0;
 	str.data.buf[0] = 0;
+
+	return *this;
 }
 
 my::string& my::string::operator= (const char* s)

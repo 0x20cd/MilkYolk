@@ -26,6 +26,7 @@ namespace my
 
 		list& operator=(const list& x);
 		list& operator=(list&& x);
+		list& operator=(std::initializer_list<T> il);
 
 		class iterator;
 		typedef const iterator const_iterator;
@@ -86,10 +87,7 @@ my::list<T>::list() :
 
 
 template<class T>
-my::list<T>::list(size_t n, const T& val) :
-	len(n),
-	firstNode(nullptr),
-	lastNode(nullptr)
+my::list<T>::list(size_t n, const T& val) : len(n)
 {
 	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
@@ -106,10 +104,7 @@ my::list<T>::list(size_t n, const T& val) :
 
 
 template<class T>
-my::list<T>::list(const my::list<T>& x) :
-	len(x.size()),
-	firstNode(nullptr),
-	lastNode(nullptr)
+my::list<T>::list(const my::list<T>& x) : len(x.size())
 {
 	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
@@ -126,22 +121,18 @@ my::list<T>::list(const my::list<T>& x) :
 
 
 template<class T>
-my::list<T>::list(my::list<T>&& x)
+my::list<T>::list(my::list<T>&& x) :
+	len(x.len),
+	firstNode(x.firstNode),
+	lastNode(x.lastNode)
 {
-	this->len = x.len;
-	this->firstNode = x.firstNode;
-	this->lastNode = x.lastNode;
-
 	x.len = 0;
 	x.firstNode = x.lastNode = nullptr;
 }
 
 
 template<class T>
-my::list<T>::list(std::initializer_list<T> il) :
-	len(il.size()),
-	firstNode(nullptr),
-	lastNode(nullptr)
+my::list<T>::list(std::initializer_list<T> il) : len(il.size())
 {
 	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
 
@@ -182,12 +173,35 @@ my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 template<class T>
 my::list<T>& my::list<T>::operator=(my::list<T>&& x)
 {
+	this->clear();
 	this->len = x.len;
 	this->firstNode = x.firstNode;
 	this->lastNode = x.lastNode;
 
 	x.len = 0;
 	x.firstNode = x.lastNode = nullptr;
+	return *this;
+}
+
+
+template<class T>
+my::list<T>& my::list<T>::operator=(std::initializer_list<T> il)
+{
+	this->clear();
+	this->len = il.size();
+
+	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
+
+	for (const T& v : il)
+	{
+		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
+		(*nextp)->prev = last;
+		last = *nextp;
+		nextp = &(*nextp)->next;
+	}
+
+	this->lastNode = last;
+
 	return *this;
 }
 
