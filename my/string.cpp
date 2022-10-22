@@ -30,7 +30,7 @@ my::string::string(my::string&& str)
 	this->data = str.data;
 
 	str.slen = 0;
-	memset(&str.data, 0, sizeof(my::string::data));
+	str.data.buf[0] = 0;
 }
 
 my::string::string(const char* s)
