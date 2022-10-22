@@ -25,6 +25,7 @@ namespace my
 		list(std::initializer_list<T> il);
 
 		list& operator=(const list& x);
+		list& operator=(list&& x);
 
 		class iterator;
 		typedef const iterator const_iterator;
@@ -174,6 +175,19 @@ my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 	this->len = x.size();
 	this->lastNode = last;
 
+	return *this;
+}
+
+
+template<class T>
+my::list<T>& my::list<T>::operator=(my::list<T>&& x)
+{
+	this->len = x.len;
+	this->firstNode = x.firstNode;
+	this->lastNode = x.lastNode;
+
+	x.len = 0;
+	x.firstNode = x.lastNode = nullptr;
 	return *this;
 }
 
