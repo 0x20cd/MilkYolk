@@ -13,6 +13,7 @@ namespace my
 	public:
 		string();
 		string(const string& str);
+		string(string&& str);
 		string(const char* s);
 		string(size_t n, char c);
 

@@ -24,6 +24,15 @@ my::string::string(const my::string& str)
 	memcpy(this->data.l.ptr, str.c_str(), size + 1);
 }
 
+my::string::string(my::string&& str)
+{
+	this->slen = str.slen;
+	this->data = str.data;
+
+	str.slen = 0;
+	memset(&str.data, 0, sizeof(my::string::data));
+}
+
 my::string::string(const char* s)
 {
 	size_t size = strlen(s);
