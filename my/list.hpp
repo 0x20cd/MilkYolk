@@ -21,6 +21,7 @@ namespace my
 		explicit list();
 		explicit list(size_t n, const T& val = T());
 		list(const list& x);
+		list(list&& x);
 		list(std::initializer_list<T> il);
 
 		list& operator=(const list& x);
@@ -120,6 +121,18 @@ my::list<T>::list(const my::list<T>& x) :
 	}
 
 	this->lastNode = last;
+}
+
+
+template<class T>
+my::list<T>::list(my::list<T>&& x)
+{
+	this->len = x.len;
+	this->firstNode = x.firstNode;
+	this->lastNode = x.lastNode;
+
+	x.len = 0;
+	x.firstNode = x.lastNode = nullptr;
 }
 
 
