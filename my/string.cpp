@@ -100,6 +100,15 @@ my::string& my::string::operator= (const my::string& str)
 	return *this;
 }
 
+my::string& my::string::operator= (my::string&& str)
+{
+	this->slen = str.slen;
+	this->data = str.data;
+
+	str.slen = 0;
+	str.data.buf[0] = 0;
+}
+
 my::string& my::string::operator= (const char* s)
 {
 	size_t size = strlen(s);

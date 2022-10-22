@@ -18,6 +18,7 @@ namespace my
 		string(size_t n, char c);
 
 		string& operator= (const string& str);
+		string& operator= (string&& str);
 		string& operator= (const char* s);
 		string& operator= (char c);
 		string& operator+= (const string& str);
