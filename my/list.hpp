@@ -151,6 +151,9 @@ my::list<T>::list(std::initializer_list<T> il) : len(il.size())
 template<class T>
 my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 {
+	if (this == &x)
+		return *this;
+
 	this->clear();
 
 	auto *last = nullptr, **nextp = &this->firstNode;
@@ -173,6 +176,9 @@ my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 template<class T>
 my::list<T>& my::list<T>::operator=(my::list<T>&& x)
 {
+	if (this == &x)
+		return *this;
+
 	this->clear();
 	this->len = x.len;
 	this->firstNode = x.firstNode;
