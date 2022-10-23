@@ -71,6 +71,9 @@ my::string::string(size_t n, char c)
 
 my::string& my::string::operator= (const my::string& str)
 {
+	if (this == &str)
+		return *this;
+
 	size_t size = str.size();
 	if (size < my::string::BUFSIZE)
 	{
@@ -102,6 +105,9 @@ my::string& my::string::operator= (const my::string& str)
 
 my::string& my::string::operator= (my::string&& str)
 {
+	if (this == &str)
+		return *this;
+
 	if (this->slen < 0)
 		delete[] this->data.l.ptr;
 
@@ -162,7 +168,8 @@ my::string& my::string::operator+= (const my::string& str)
 
 	if (this->slen >= 0 && rsize < my::string::BUFSIZE)
 	{
-		memcpy(this->data.buf + isize, str.c_str(), size + 1);
+		memcpy(this->data.buf + isize, str.c_str(), size);
+		this->data.buf[rsize] = 0;
 		this->slen = rsize;
 		return *this;
 	}
@@ -184,7 +191,8 @@ my::string& my::string::operator+= (const my::string& str)
 		this->data.l.ptr = p;
 	}
 
-	memcpy(this->data.l.ptr + isize, str.c_str(), size + 1);
+	memcpy(this->data.l.ptr + isize, str.c_str(), size);
+	this->data.l.ptr[rsize] = 0;
 	this->data.l.len = rsize;
 	this->data.l.res = rsize + 1;
 
