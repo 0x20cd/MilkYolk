@@ -1,21 +1,30 @@
 #ifndef MY_LIST_HPP
 #define MY_LIST_HPP
 #include <cstddef>
+#include <cstdlib>
 #include <initializer_list>
 
 namespace my
 {
+	struct list_node_base
+	{
+		union { list_node_base *next, *first; };
+		union { list_node_base *prev, *last; };
+	};
 
 	template <class T>
 	class list
 	{
 	private:
-		size_t len;
-		struct node
+		struct list_node : public list_node_base
 		{
-			node *prev, *next;
-			T value;
-		} *firstNode, *lastNode;
+			list_node(const T& val = T()) : val(val) {}
+			list_node(list_node_base *next, list_node_base *prev, const T& val) : list_node_base{next, prev}, val(val) {}
+			T val;
+		};
+
+		list_node_base data;
+		size_t len;
 
 	public:
 		explicit list();
@@ -29,31 +38,64 @@ namespace my
 		list& operator=(std::initializer_list<T> il);
 
 		class iterator;
-		typedef const iterator const_iterator;
+		class const_iterator;
 
 		class iterator
 		{
 		public:
-			iterator(node* ptr = nullptr);
-			iterator(const_iterator& it);
+			iterator(list_node_base* ptr = nullptr);
+			iterator(const iterator& it);
 
-			iterator& operator=(const_iterator& it);
+			iterator& operator=(const iterator& it);
 
-			T& operator*();
-			const T& operator*() const;
-			T* operator->();
-			const T* operator->() const;
+			T& operator*() const;
+			T* operator->() const;
 
 			iterator& operator++();
 			iterator operator++(int);
 			iterator& operator--();
 			iterator operator--(int);
 
-			bool operator==(const_iterator& itr) const;
-			bool operator!=(const_iterator& itr) const;
+			friend bool operator==(const typename my::list<T>::iterator& it_l, const typename my::list<T>::iterator& it_r) {
+				return it_l.ptr == it_r.ptr;
+			}
+
+			friend bool operator!=(const typename my::list<T>::iterator& it_l, const typename my::list<T>::iterator& it_r) {
+				return it_l.ptr != it_r.ptr;
+			}
 
 		private:
-			node *ptr;
+			list_node_base *ptr;
+		};
+
+		class const_iterator
+		{
+		public:
+			const_iterator(const list_node_base* ptr = nullptr);
+			const_iterator(const iterator& it);
+			const_iterator(const const_iterator& cit);
+
+			const_iterator& operator=(const iterator& it);
+			const_iterator& operator=(const const_iterator& cit);
+
+			const T& operator*() const;
+			const T* operator->() const;
+
+			const_iterator& operator++();
+			const_iterator operator++(int);
+			const_iterator& operator--();
+			const_iterator operator--(int);
+
+			friend bool operator==(const typename my::list<T>::const_iterator& cit_l, const typename my::list<T>::const_iterator& cit_r) {
+				return cit_l.ptr == cit_r.ptr;
+			}
+
+			friend bool operator!=(const typename my::list<T>::const_iterator& cit_l, const typename my::list<T>::const_iterator& cit_r) {
+				return cit_l.ptr != cit_r.ptr;
+			}
+
+		private:
+			const list_node_base *ptr;
 		};
 
 		iterator begin();
@@ -72,7 +114,6 @@ namespace my
 
 		~list();
 	};
-
 }
 
 
@@ -80,71 +121,80 @@ namespace my
 
 
 template<class T>
-my::list<T>::list() :
-	len(0),
-	firstNode(nullptr),
-	lastNode(nullptr) {}
+my::list<T>::list()
+ : data{&data, &data}
+ , len(0)
+{}
 
 
 template<class T>
-my::list<T>::list(size_t n, const T& val) : len(n)
+my::list<T>::list(size_t n, const T& val)
+ : data{&data, &data}
+ , len(n)
 {
-	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
+	my::list_node_base *last = &data, **nextp = &data.first;
 
 	for (size_t i = 0; i < n; ++i)
 	{
-		*nextp = new my::list<T>::node{nullptr, nullptr, {val}};
+		*nextp = new list_node(val);
 		(*nextp)->prev = last;
 		last = *nextp;
 		nextp = &(*nextp)->next;
 	}
+	*nextp = &data;
 
-	this->lastNode = last;
+	data.last = last;
 }
 
 
 template<class T>
-my::list<T>::list(const my::list<T>& x) : len(x.size())
+my::list<T>::list(const my::list<T>& x)
+ : data{&data, &data}
+ , len(x.len)
 {
-	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
+	my::list_node_base *last = &data, **nextp = &data.first;
 
-	for (const T& v : x)
+	for (const T& val : x)
 	{
-		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
+		*nextp = new list_node(val);
 		(*nextp)->prev = last;
 		last = *nextp;
 		nextp = &(*nextp)->next;
 	}
+	*nextp = &data;
 
-	this->lastNode = last;
+	data.last = last;
 }
 
 
 template<class T>
-my::list<T>::list(my::list<T>&& x) :
-	len(x.len),
-	firstNode(x.firstNode),
-	lastNode(x.lastNode)
+my::list<T>::list(my::list<T>&& x)
+ : data{x.data.first, x.data.last}
+ , len(x.len)
 {
+	data.first->prev = data.last->next = &data;
+	x.data.first = x.data.last = &x.data;
 	x.len = 0;
-	x.firstNode = x.lastNode = nullptr;
 }
 
 
 template<class T>
-my::list<T>::list(std::initializer_list<T> il) : len(il.size())
+my::list<T>::list(std::initializer_list<T> il)
+ : data{&data, &data}
+ , len(il.size())
 {
-	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
+	my::list_node_base *last = &data, **nextp = &data.first;
 
-	for (const T& v : il)
+	for (const T& val : il)
 	{
-		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
+		*nextp = new list_node(val);
 		(*nextp)->prev = last;
 		last = *nextp;
 		nextp = &(*nextp)->next;
 	}
+	*nextp = &data;
 
-	this->lastNode = last;
+	data.last = last;
 }
 
 
@@ -155,19 +205,7 @@ my::list<T>& my::list<T>::operator=(const my::list<T>& x)
 		return *this;
 
 	this->clear();
-
-	auto *last = nullptr, **nextp = &this->firstNode;
-
-	for (const T& v : x)
-	{
-		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
-		(*nextp)->prev = last;
-		last = *nextp;
-		nextp = &(*nextp)->next;
-	}
-
-	this->len = x.size();
-	this->lastNode = last;
+	new(this) list(x);
 
 	return *this;
 }
@@ -180,12 +218,8 @@ my::list<T>& my::list<T>::operator=(my::list<T>&& x)
 		return *this;
 
 	this->clear();
-	this->len = x.len;
-	this->firstNode = x.firstNode;
-	this->lastNode = x.lastNode;
+	new(this) list(std::move(x));
 
-	x.len = 0;
-	x.firstNode = x.lastNode = nullptr;
 	return *this;
 }
 
@@ -194,19 +228,7 @@ template<class T>
 my::list<T>& my::list<T>::operator=(std::initializer_list<T> il)
 {
 	this->clear();
-	this->len = il.size();
-
-	my::list<T>::node *last = nullptr, **nextp = &this->firstNode;
-
-	for (const T& v : il)
-	{
-		*nextp = new my::list<T>::node{nullptr, nullptr, {v}};
-		(*nextp)->prev = last;
-		last = *nextp;
-		nextp = &(*nextp)->next;
-	}
-
-	this->lastNode = last;
+	new(this) list(il);
 
 	return *this;
 }
@@ -215,158 +237,148 @@ my::list<T>& my::list<T>::operator=(std::initializer_list<T> il)
 template<class T>
 typename my::list<T>::iterator my::list<T>::begin()
 {
-	return my::list<T>::iterator(firstNode);
+	return iterator(data.first);
 }
 
 
 template<class T>
 typename my::list<T>::iterator my::list<T>::end()
 {
-	return my::list<T>::iterator(nullptr);
+	return iterator(&data);
 }
 
 
 template<class T>
 typename my::list<T>::const_iterator my::list<T>::begin() const
 {
-	return my::list<T>::const_iterator(firstNode);
+	return const_iterator(data.first);
 }
 
 
 template<class T>
 typename my::list<T>::const_iterator my::list<T>::end() const
 {
-	return my::list<T>::const_iterator(nullptr);
+	return const_iterator(&data);
 }
 
 
 template<class T>
 typename my::list<T>::const_iterator my::list<T>::cbegin() const
 {
-	return my::list<T>::const_iterator(firstNode);
+	return const_iterator(data.first);
 }
 
 
 template<class T>
 typename my::list<T>::const_iterator my::list<T>::cend() const
 {
-	return my::list<T>::const_iterator(nullptr);
+	return const_iterator(&data);
 }
 
 
 template<class T>
 bool my::list<T>::empty() const
 {
-	return this->len==0;
+	return !len;
 }
 
 
 template<class T>
 size_t my::list<T>::size() const
 {
-	return this->len;
+	return len;
 }
 
 
 template<class T>
 void my::list<T>::push_back(const T& val)
 {
-	auto **nextp = this->len++ ? &this->lastNode->next : &this->firstNode;
-
-	this->lastNode = *nextp = new my::list<T>::node{this->lastNode, nullptr, {val}};
+	my::list_node_base **nextp = len++ ? &data.last->next : &data.first;
+	data.last = *nextp = new list_node(&data, data.last, val);
 }
 
 template<class T>
 void my::list<T>::pop_back()
 {
-	if (!this->lastNode) // len = 0
+	if (len == 0)
 		return;
 
-	auto *t = this->lastNode;
-	this->lastNode = t->prev;
-	delete t;
+	my::list_node_base *t = data.last;
+	data.last = t->prev;
+	data.last->next = &data;
+	delete static_cast<list_node*>(t);
 
-	if (!this->lastNode) // len = 1
-		this->firstNode = nullptr;
-
-	--this->len;
+	if (--len == 0)
+		data.first = &data;
 }
 
 
 template<class T>
 void my::list<T>::clear()
 {
-	for(my::list<T>::node *p = this->lastNode, *t; p;)
+	for(my::list_node_base *p = data.first, *t; p != &data; )
 	{
 		t = p;
-		p = p->prev;
-		delete t;
+		p = p->next;
+		delete static_cast<list_node*>(t);
 	}
 
-	this->len = 0;
-	this->firstNode = this->lastNode = nullptr;
+	data.first = data.last = &data;
+	len = 0;
 }
 
 
 template<class T>
 my::list<T>::~list()
 {
-	this->clear();
+	for(my::list_node_base *p = data.first, *t; p != &data; )
+	{
+		t = p;
+		p = p->next;
+		delete static_cast<list_node*>(t);
+	}
 }
 
 
 ////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+///////////////////////                      ///////////////////////
 ///////////////////////    list::iterator    ///////////////////////
+///////////////////////                      ///////////////////////
+////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 
 
 template<class T>
-my::list<T>::iterator::iterator(typename my::list<T>::node* ptr)
-{
-	this->ptr = ptr;
-}
+my::list<T>::iterator::iterator(list_node_base* ptr)
+ : ptr(ptr)
+{}
 
 
 template<class T>
-my::list<T>::iterator::iterator(typename my::list<T>::const_iterator& it)
+my::list<T>::iterator::iterator(const my::list<T>::iterator& it)
+ : ptr(it.ptr)
+{}
+
+
+template<class T>
+typename my::list<T>::iterator& my::list<T>::iterator::operator=(const my::list<T>::iterator& it)
 {
 	this->ptr = it.ptr;
 }
 
 
 template<class T>
-typename my::list<T>::iterator& my::list<T>::iterator::operator=(typename my::list<T>::const_iterator& it)
+T& my::list<T>::iterator::operator*() const
 {
-	this->ptr = it.ptr;
-	return *this;
+	return static_cast<my::list<T>::list_node*>(this->ptr)->val;
 }
 
 
 template<class T>
-T& my::list<T>::iterator::operator*()
+T* my::list<T>::iterator::operator->() const
 {
-	return this->ptr->value;
-}
-
-
-template<class T>
-const T& my::list<T>::iterator::operator*() const
-{
-	return this->ptr->value;
-}
-
-
-template<class T>
-T* my::list<T>::iterator::operator->()
-{
-	return &this->ptr->value;
-}
-
-
-template<class T>
-const T* my::list<T>::iterator::operator->() const
-{
-	return &this->ptr->value;
+	return &static_cast<my::list<T>::list_node*>(this->ptr)->val;
 }
 
 
@@ -381,7 +393,7 @@ typename my::list<T>::iterator& my::list<T>::iterator::operator++()
 template<class T>
 typename my::list<T>::iterator my::list<T>::iterator::operator++(int)
 {
-	typename my::list<T>::iterator it = *this;
+	my::list<T>::iterator it(this->ptr);
 	this->ptr = this->ptr->next;
 	return it;
 }
@@ -398,23 +410,126 @@ typename my::list<T>::iterator& my::list<T>::iterator::operator--()
 template<class T>
 typename my::list<T>::iterator my::list<T>::iterator::operator--(int)
 {
-	typename my::list<T>::iterator it = *this;
+	my::list<T>::iterator it(this->ptr);
 	this->ptr = this->ptr->prev;
 	return it;
 }
 
 
 template<class T>
-bool my::list<T>::iterator::operator==(typename my::list<T>::const_iterator& itr) const
+bool operator==(const typename my::list<T>::iterator& it_l, const typename my::list<T>::iterator& it_r)
 {
-	return this->ptr == itr.ptr;
+	return it_l.ptr == it_r.ptr;
 }
 
 
 template<class T>
-bool my::list<T>::iterator::operator!=(typename my::list<T>::const_iterator& itr) const
+bool operator!=(const typename my::list<T>::iterator& it_l, const typename my::list<T>::iterator& it_r)
 {
-	return this->ptr != itr.ptr;
+	return it_l.ptr != it_r.ptr;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+///////////////////////                            ///////////////////////
+///////////////////////    list::const_iterator    ///////////////////////
+///////////////////////                            ///////////////////////
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+
+template<class T>
+my::list<T>::const_iterator::const_iterator(const list_node_base* ptr)
+ : ptr(ptr)
+{}
+
+
+template<class T>
+my::list<T>::const_iterator::const_iterator(const typename my::list<T>::iterator& it)
+ : ptr(it.ptr)
+{}
+
+
+template<class T>
+my::list<T>::const_iterator::const_iterator(const typename my::list<T>::const_iterator& cit)
+ : ptr(cit.ptr)
+{}
+
+
+template<class T>
+typename my::list<T>::const_iterator& my::list<T>::const_iterator::operator=(const typename my::list<T>::iterator& it)
+{
+	this->ptr = it.ptr;
+}
+
+
+template<class T>
+typename my::list<T>::const_iterator& my::list<T>::const_iterator::operator=(const typename my::list<T>::const_iterator& cit)
+{
+	this->ptr = cit.ptr;
+}
+
+
+template<class T>
+const T& my::list<T>::const_iterator::operator*() const
+{
+	return static_cast<const my::list<T>::list_node*>(this->ptr)->val;
+}
+
+
+template<class T>
+const T* my::list<T>::const_iterator::operator->() const
+{
+	return &static_cast<const my::list<T>::list_node*>(this->ptr)->val;
+}
+
+
+template<class T>
+typename my::list<T>::const_iterator& my::list<T>::const_iterator::operator++()
+{
+	this->ptr = this->ptr->next;
+	return *this;
+}
+
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::const_iterator::operator++(int)
+{
+	my::list<T>::const_iterator cit(this->ptr);
+	this->ptr = this->ptr->next;
+	return cit;
+}
+
+
+template<class T>
+typename my::list<T>::const_iterator& my::list<T>::const_iterator::operator--()
+{
+	this->ptr = this->ptr->prev;
+	return *this;
+}
+
+
+template<class T>
+typename my::list<T>::const_iterator my::list<T>::const_iterator::operator--(int)
+{
+	my::list<T>::const_iterator cit(this->ptr);
+	this->ptr = this->ptr->prev;
+	return cit;
+}
+
+
+template<class T>
+bool operator==(const typename my::list<T>::const_iterator& cit_l, const typename my::list<T>::const_iterator& cit_r)
+{
+	return cit_l.ptr == cit_r.ptr;
+}
+
+
+template<class T>
+bool operator!=(const typename my::list<T>::const_iterator& cit_l, const typename my::list<T>::const_iterator& cit_r)
+{
+	return cit_l.ptr != cit_r.ptr;
 }
 
 
